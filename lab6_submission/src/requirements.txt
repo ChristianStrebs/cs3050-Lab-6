@@ -1,0 +1,7 @@
+# Python requirements for CS3050 Lab 6
+# No external libraries required - uses only Python standard library
+
+# Optional for testing and profiling:
+# pytest>=7.0.0
+# pytest-benchmark>=4.0.0
+# matplotlib>=3.5.0  # For plotting performance results

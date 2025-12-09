@@ -1,0 +1,98 @@
+# Test Results for CS3050 Lab 6
+# Christian Streby
+# December 2025
+
+## Test Case 1: Feasible Time Windows
+
+Input: test_feasible_nodes.csv, test_feasible_edges.csv
+Start: 1, End: 4
+Algorithm: dijkstra
+
+Result: SUCCESS - A path exists
+Path: 1 -> 2 -> 4
+Total distance: 56.00 km
+Nodes explored: 4
+
+Notes:
+- The algorithm found a path that works with all the time windows
+- It skips the 1->3->4 route, probably because of timing issues
+- Everything arrives within the allowed windows
+
+---
+
+## Test Case 2: Infeasible Time Windows
+
+Input: test_infeasible_nodes.csv, test_infeasible_edges.csv
+Start: 1, End: 4
+Algorithm: dijkstra
+
+Result: NO FEASIBLE PATH (expected this)
+
+Constraint violations detected:
+- Node 3: gets there around 48.00, but the cutoff is 32.00 (16.00 too late)
+- Node 4: arrives at 66.00 but needs to be there by 15.00 (way too late, 51.00 over)
+
+Closest alternative path it found:
+Path: 1 -> 2 -> 3 -> 4
+Distance: 66.00 km
+Violations: Node 3 is 16.00 late, Node 4 is 51.00 late
+
+Notes:
+- Algorithm found there's no way to make this work
+- It tells you exactly which nodes break the rules and by how much
+- Still gives you the shortest path even though it violates the constraints
+
+---
+
+## Test Case 3: Shortest Path Violates Constraints
+
+Input: test_shortest_violates_nodes.csv, test_shortest_violates_edges.csv
+Start: 1, End: 4
+Algorithm: dijkstra
+
+Result: SUCCESS - Found a feasible path
+Path: 1 -> 3 -> 4
+Total distance: 30.00 km
+Nodes explored: 3
+
+Notes:
+- This is actually the shortest path (1->3 is 12km, 3->4 is 18km)
+- The waiting thing works - if you get somewhere early you just wait
+- At node 3 the window is [22,38], so getting there at time 12 means you wait till 22
+- Node 4's window is [75,105] so it all works out with the waiting
+
+---
+
+## Priority-Based Routing
+
+Test setup: bunch of destinations with different priorities
+Start: 1
+Destinations: {2: HIGH, 3: HIGH, 5: MEDIUM, 6: MEDIUM, 7: LOW}
+
+What should happen:
+- Hit ALL the HIGH priority spots first (nodes 2 and 3)
+- Then go to ALL the MEDIUM priority ones (nodes 5 and 6)
+- Finally get to the LOW priority stuff (node 7)
+- Within each group, just go to whichever one is closest
+
+Implementation: priority_multi_destination_routing() function
+
+Notes:
+- The greedy thing makes sure priorities stay in order
+- Shouldn't get any violations if it's coded right
+- There's a threshold parameter in there for later if needed
+
+---
+
+## Summary
+
+Got the main stuff working:
+1. Time-window routing using modified Dijkstra
+2. Checks earliest and latest arrival times properly
+3. Waiting policy for when you show up too early
+4. Catches violations and gives you useful error info
+5. Suggests backup paths when nothing works
+6. Priority routing framework for multiple stops
+
+Performance seems fine for the smaller/medium graphs I tested. The pruning
+(keeping track of best arrival time per node) stops it from exploding.
